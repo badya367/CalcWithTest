@@ -1,4 +1,4 @@
-import com.company.Main;
+import com.company.Calc;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
@@ -6,9 +6,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import org.testng.internal.reflect.MethodMatcherException;
-
-import java.math.BigDecimal;
 
 
 /**
@@ -29,160 +26,246 @@ public class CalcTests {
         log.info("Подчищаем после теста");
     }
 
-
-/**
-     * Позитивное и негативное тестирование операции "Сумма"
+    /**
+     * ----------------------------------------
+     * Позитивное
+     * Негативное
+     * Тестирование на считывание знака операции
+     * ----------------------------------------
      */
-
     @DataProvider
-    public Object [][] positiveSum() {
-        return new Object[][] {
-                {2147483647, 2147483646, 1}
+    Object[][] calculationArgumentsProvider(){
+        return new Object[][]{
+                {"1","2",'+',"3"},
+                {"1","2",'-',"-1"},
+                {"1","2",'/',"0.5"},
+                {"1111111111111","2",'*',"2"}
         };
     }
-    @Test(dataProvider = "positiveSum")
-    public void testPSum(String one, BigDecimal two, BigDecimal three) {
-        Assert.assertEquals(one, Main.calc(two, three, '+'), "Суммы верны" );
+    @Test (dataProvider = "calculationArgumentsProvider")
+    void setOperationsPositiveTest(String arg1,String arg2, char operation,String result){
+        Assert.assertTrue(Calc.validateOperation(operation));
     }
 
     @DataProvider
-    public Object [][] negativeSum() {
-        return new Object[][] {
-                {0,-1,-1},
-                {-2,1,3},
-                {-5,3,-2},
-                {10,7,6}
+    Object[][] calculationArgumentsProviderNeg(){
+        return new Object[][]{
+                {"1","2",'%',"3"},
+                {"1","2",'$',"-1"},
+                {"1","2",'&',"0.5"},
+                {"1111111111111","2",'#',"2"}
         };
     }
-    @Test(dataProvider = "negativeSum")
-    public void testNSum(BigDecimal one, BigDecimal two, BigDecimal three) {
-        Assert.assertNotEquals(one, Main.calc(two, three, '+'), "Суммы не верны" );
+    @Test (dataProvider = "calculationArgumentsProviderNeg")
+    void setOperationsNegativeTest(String arg1,String arg2, char operation,String result){
+        Assert.assertFalse(Calc.validateOperation(operation));
     }
 
-
-/**
-     * Позитивное и негативное тестирование операции "Вычитание"
-     *
+    /**
+     * ----------------------------------------
+     * Позитивное
+     * Негативное
+     * Тестирование на считывание символов
+     * с клавиатуры
+     * ----------------------------------------
      */
-
     @DataProvider
-    public Object [][] positiveSub() {
-        return new Object[][] {
-                {0,1,1},
-                {-2,-3,-1},
-                {-5,3,8},
-                {2,5,3}
+    Object[][] validateArgsPos(){
+        return new Object[][]{
+                {"10","2",'+',"12"},
+                {"10","2",'-',"8"},
+                {"1","2",'/',"0.5"},
+                {"1.0","2.0",'*',"2"},
         };
     }
-    @Test(dataProvider = "positiveSub")
-    public void testPSub(BigDecimal one, BigDecimal two, BigDecimal three) {
-        Assert.assertEquals(one, Main.calc(two, three, '-'), "Вычитание прошло успешно" );
+    @Test (dataProvider = "validateArgsPos")
+    void validateArgs(String arg1,String arg2, char operation, String result){
+        Assert.assertTrue(Calc.validate(arg1));
+        Assert.assertTrue(Calc.validate(arg2));
     }
+
     @DataProvider
-    public Object [][] negativeSub() {
-        return new Object[][] {
-                {0,1,-1},
-                {-2,3,-1},
-                {5,3,8},
-                {2,-5,3}
+    Object[][] validateArgsNeg(){
+        return new Object[][]{
+                {"1o","two",'+',"12"},
+                {"десять","попугаев",'-',"8"},
+                {"sdf","vasd",'/',"0.5"},
+                {"1,0","2,0",'*',"2"},
         };
     }
-    @Test(dataProvider = "negativeSub")
-    public void testNSub(BigDecimal one, BigDecimal two, BigDecimal three) {
-        Assert.assertNotEquals(one, Main.calc(two, three, '-'), "Вычитание произошло с ошибкой");
+    @Test (dataProvider = "validateArgsNeg")
+    void validateArgsNeg(String arg1,String arg2, char operation, String result){
+        Assert.assertFalse(Calc.validate(arg1));
+        Assert.assertFalse(Calc.validate(arg2));
     }
 
-
-/**
-     * Позитивное и негативное тестирование операции "Умножение"
+    /**
+     * ----------------------------------------
+     * Тестирование граничных значений
+     * вводимых с клавиатуры
+     * ----------------------------------------
      */
-
-
     @DataProvider
-    public Object [][] positiveMul() {
-        return new Object[][] {
-                {0,1,0},
-                {-6,-3,2},
-                {9,-3,-3},
-                {4,2,2}
+    Object [][] borderIn(){
+        return new Object[][]{
+                {"-2147483649","2147483647",'+',"-2"},
+                {"2147483648","-2147483648",'+',"0"},
         };
     }
-    @Test(dataProvider = "positiveMul")
-    public void testPMul(BigDecimal one, BigDecimal two, BigDecimal three) {
-        Assert.assertEquals(one, Main.calc(two, three, '*'), "Умножение прошло успешно" );
+    @Test (dataProvider = "borderIn")
+    void testIntegerArgument(String arg1,String arg2, char operation, String result){
+        Assert.assertFalse(Calc.validate(arg1));
+        Assert.assertTrue(Calc.validate(arg2));
     }
 
-    @DataProvider
-    public Object [][] negativeMul() {
-        return new Object[][] {
-                {0,1,-1},
-                {-2,-3,1},
-                {-5,3,4},
-                {2,5,3}
-        };
-    }
-    @Test(dataProvider = "negativeMul")
-    public void testNMul(BigDecimal one, BigDecimal two, BigDecimal three) {
-        Assert.assertNotEquals(one, Main.calc(two, three, '*'), "Умножение прошло с ошибкой" );
-    }
-
-
-/**
-     * Позитивное и негативное тестирование операции "Деление"
-     * Деление на ноль
-     * Деление с остатком
+    /**
+     * ----------------------------------------
+     * Позитивное
+     * Негативное
+     * Тестирование операции "Сложение"
+     * ----------------------------------------
      */
-
-
     @DataProvider
-    public Object [][] positiveDiv() {
-        return new Object[][] {
-                {3,6,2},
-                {-2,-4,2},
-                {5,-20,-4},
-                {-5,15,-3},
-                {0,0,5}
+    Object [][] positiveSum(){
+        return new Object[][]{
+                {"1","1",'+',"2"},
+                {"0","0",'+',"0"},
+                {"-1","0.5",'+',"-0.5"}
         };
     }
-    @Test(dataProvider = "positiveDiv")
-    public void testPDiv(BigDecimal one, BigDecimal two, BigDecimal three) {
-        Assert.assertEquals(one, Main.calc(two, three, '/'), "Деление прошло успешно" );
+    @Test (dataProvider = "positiveSum")
+    void testPSum(String arg1,String arg2, char operation, String result){
+        Assert.assertEquals(Calc.start(arg1,arg2,operation),result);
     }
 
     @DataProvider
-    public Object [][] negativeDiv() {
-        return new Object[][] {
-                {0,1,1},
-                {-5,3,8},
-                {2,5,3}
+    Object [][] negativeSum(){
+        return new Object[][]{
+                {"1","1",'+',"5"},
+                {"0","0",'+',"100"},
+                {"-1","0.5",'+',"-500"}
         };
     }
-    @Test(dataProvider = "negativeDiv")
-    public void testNDiv(BigDecimal one, BigDecimal two, BigDecimal three) {
-        Assert.assertNotEquals(one, Main.calc(two, three, '/'), "Деление прошло с ошибкой" );
+    @Test (dataProvider = "negativeSum")
+    void testNSum(String arg1,String arg2, char operation, String result){
+        Assert.assertNotEquals(Calc.start(arg1,arg2,operation),result);
+    }
+
+    /**
+     * ----------------------------------------
+     * Позитивное
+     * Негативное
+     * Тестирование операции "Вычитание"
+     * ----------------------------------------
+     */
+    @DataProvider
+    Object [][] positiveSub(){
+        return new Object[][]{
+                {"1","1",'-',"0"},
+                {"0","0",'-',"0"},
+                {"-1","0.5",'-',"-1.5"},
+                {"5","-0.5",'-',"5.5"},
+        };
+    }
+    @Test (dataProvider = "positiveSub")
+    void testPSub(String arg1,String arg2, char operation, String result){
+        Assert.assertEquals(Calc.start(arg1,arg2,operation),result);
     }
 
     @DataProvider
-    public Object [][] SCDiv() {
-        return new Object[][] {
-                {0,10,0},
+    Object [][] negativeSub(){
+        return new Object[][]{
+                {"1","1",'-',"5"},
+                {"0","0",'-',"100"},
+                {"-1","0.5",'-',"-500"}
         };
     }
-    @Test(dataProvider = "SCDiv", expectedExceptions = ArithmeticException.class)
-    public void testSpecialCasesDiv(BigDecimal one, BigDecimal two, BigDecimal three) {
-        Assert.assertEquals(one, Main.calc(two, three, '/'), "Деление на ноль прошло успешно");
+    @Test (dataProvider = "negativeSub")
+    void testNSub(String arg1,String arg2, char operation, String result){
+        Assert.assertNotEquals(Calc.start(arg1,arg2,operation),result);
+    }
+
+    /**
+     * ----------------------------------------
+     * Позитивное
+     * Негативное
+     * Тестирование операции "Умножение"
+     * ----------------------------------------
+     */
+    @DataProvider
+    Object [][] positiveMul(){
+        return new Object[][]{
+                {"1","1",'*',"1"},
+                {"0","0",'*',"0"},
+                {"-1","0.5",'*',"-0.5"},
+                {"5","0",'*',"0"},
+                {"5","5",'*',"25"},
+        };
+    }
+    @Test (dataProvider = "positiveMul")
+    void testPMul(String arg1,String arg2, char operation, String result){
+        Assert.assertEquals(Calc.start(arg1,arg2,operation),result);
     }
 
     @DataProvider
-    public Object [][] withoutRemainderDiv() {
-        return new Object[][] {
-                {3,15,4},
-                {2,18,7}
+    Object [][] negativeMul(){
+        return new Object[][]{
+                {"1","1",'*',"10"},
+                {"0","0",'*',"100"},
+                {"-1","0.5",'*',"0.5"},
+                {"5","0",'*',"5"},
+                {"5","5",'*',"30"},
         };
     }
-    @Test(dataProvider = "withoutRemainderDiv")
-    public void testWithoutRemainderDiv(BigDecimal one, BigDecimal two, BigDecimal three) {
-        Assert.assertEquals(one, Main.calc(two, three, '/'), "Деление c остатком прошло успешно");
+    @Test (dataProvider = "negativeMul")
+    void testNMul(String arg1,String arg2, char operation, String result){
+        Assert.assertNotEquals(Calc.start(arg1,arg2,operation),result);
+    }
+
+    /**
+     * ----------------------------------------
+     * Позитивное
+     * Негативное
+     * Тестирование операции "Деление"
+     * Тестирование деления на "ноль"
+     * ----------------------------------------
+     */
+    @DataProvider
+    Object [][] positiveDiv(){
+        return new Object[][]{
+                {"1","1",'/',"1.0"},
+                {"0","5",'/',"0.0"},
+                {"-1","0.5",'/',"-2.0"},
+                {"5","13",'/',"0.38461538461538464"},
+        };
+    }
+    @Test (dataProvider = "positiveDiv")
+    void testPDiv(String arg1,String arg2, char operation, String result){
+        Assert.assertEquals(Calc.start(arg1,arg2,operation),result);
+    }
+
+    @DataProvider
+    Object [][] negativeDiv(){
+        return new Object[][]{
+                {"1","1",'/',"10"},
+                {"0","5",'/',"5"},
+                {"-1","0.5",'/',"2"},
+                {"5","13",'/',"0.384"},
+        };
+    }
+    @Test (dataProvider = "negativeDiv")
+    void testNDiv(String arg1,String arg2, char operation, String result){
+        Assert.assertNotEquals(Calc.start(arg1,arg2,operation),result);
+    }
+
+    @DataProvider
+    Object [][] nullDiv(){
+        return new Object[][]{
+                {"10","0",'/',"Error"},
+        };
+    }
+    @Test (dataProvider = "nullDiv", expectedExceptions = NumberFormatException.class)
+    void testNullDiv(String arg1,String arg2, char operation, String result){
+        Assert.assertEquals(Calc.start(arg1,arg2,operation),result);
     }
 }
-
