@@ -1,5 +1,7 @@
 package com.company;
 
+import java.math.BigDecimal;
+
 import java.util.Scanner;
 
 /**
@@ -17,25 +19,36 @@ public class Main {
     static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        int num1 = getInt();
+        BigDecimal num1 = getInt();
         char operation = getOperation();
-        int num2 = getInt();
-        int result = calc(num1, num2, operation);
+        BigDecimal num2 = getInt();
+        String result = calc(num1, num2, operation);
         System.out.println("Результат: " + result);
 
     }
 
-    public static int getInt() {
+    public static BigDecimal getInt() {
         System.out.println("Введите число");
-        int number;
-        if (scanner.hasNextInt()) {
-            number = scanner.nextInt();
-        } else {
+        BigDecimal maxValue = BigDecimal.valueOf(Integer.MAX_VALUE);
+        BigDecimal minValue = BigDecimal.valueOf(Integer.MIN_VALUE);
+
+        BigDecimal number;
+
+        if (scanner.hasNextBigDecimal()) {
+            number = scanner.nextBigDecimal();
+        }
+        else {
             System.out.println("Допущена ошибка при вводе числа. Попробуйте ещё раз");
             scanner.next();
-            number = getInt();
+            return getInt();
         }
-        return number;
+        if (number.compareTo(maxValue)<=0 && number.compareTo(minValue)>=0) {
+            return number;
+        }
+        else {
+            System.out.println("число больше максимального значения");
+            return getInt();
+        }
     }
 
     public static char getOperation() {
@@ -51,28 +64,22 @@ public class Main {
         return operation;
     }
 
-    public static int calc(int num1, int num2, char operation) {
-        int result;
+    public static String calc(BigDecimal num1, BigDecimal num2, char operation) {
+
 
         switch (operation) {
             case '+':
-                result = num1 + num2;
-                break;
+                return num1.add(num2).toString();
             case '-':
-                result = num1 - num2;
-                break;
+                return num1.subtract(num2).toString();
             case '*':
-                result = num1 * num2;
-                break;
+                return num1.multiply(num2).toString();
             case '/':
-                result = num1 / num2;
-                break;
+                return BigDecimal.valueOf(num1.doubleValue()/num2.doubleValue()).toString();
             default:
                 System.out.println("Неизвестная операция. Попробуйте снова ('+', '-', '*', '/')");
-                result = calc(num1, num2, getOperation());
+                return calc(num1, num2, getOperation());
         }
-
-        return result;
 
     }
 }

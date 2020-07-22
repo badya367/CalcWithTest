@@ -6,7 +6,9 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.testng.internal.reflect.MethodMatcherException;
 
+import java.math.BigDecimal;
 
 
 /**
@@ -14,6 +16,7 @@ import org.testng.annotations.Test;
  * Выполняет тестирование операций из класса Main: Сложение, Вычитание, Умножение, Деление
  * @author Badikov Dmitriy
  */
+
 public class CalcTests {
     private static final Logger log = LogManager.getLogger();
     @BeforeClass
@@ -26,20 +29,19 @@ public class CalcTests {
         log.info("Подчищаем после теста");
     }
 
-    /**
+
+/**
      * Позитивное и негативное тестирование операции "Сумма"
      */
+
     @DataProvider
     public Object [][] positiveSum() {
         return new Object[][] {
-                {0,-1,1},
-                {-2,1,-3},
-                {-5,-3,-2},
-                {10,4,6}
+                {2147483647, 2147483646, 1}
         };
     }
     @Test(dataProvider = "positiveSum")
-    public void testPSum(int one, int two, int three) {
+    public void testPSum(String one, BigDecimal two, BigDecimal three) {
         Assert.assertEquals(one, Main.calc(two, three, '+'), "Суммы верны" );
     }
 
@@ -53,14 +55,16 @@ public class CalcTests {
         };
     }
     @Test(dataProvider = "negativeSum")
-    public void testNSum(int one, int two, int three) {
+    public void testNSum(BigDecimal one, BigDecimal two, BigDecimal three) {
         Assert.assertNotEquals(one, Main.calc(two, three, '+'), "Суммы не верны" );
     }
 
-    /**
+
+/**
      * Позитивное и негативное тестирование операции "Вычитание"
      *
      */
+
     @DataProvider
     public Object [][] positiveSub() {
         return new Object[][] {
@@ -71,7 +75,7 @@ public class CalcTests {
         };
     }
     @Test(dataProvider = "positiveSub")
-    public void testPSub(int one, int two, int three) {
+    public void testPSub(BigDecimal one, BigDecimal two, BigDecimal three) {
         Assert.assertEquals(one, Main.calc(two, three, '-'), "Вычитание прошло успешно" );
     }
     @DataProvider
@@ -84,13 +88,15 @@ public class CalcTests {
         };
     }
     @Test(dataProvider = "negativeSub")
-    public void testNSub(int one, int two, int three) {
+    public void testNSub(BigDecimal one, BigDecimal two, BigDecimal three) {
         Assert.assertNotEquals(one, Main.calc(two, three, '-'), "Вычитание произошло с ошибкой");
     }
 
-    /**
+
+/**
      * Позитивное и негативное тестирование операции "Умножение"
      */
+
 
     @DataProvider
     public Object [][] positiveMul() {
@@ -102,7 +108,7 @@ public class CalcTests {
         };
     }
     @Test(dataProvider = "positiveMul")
-    public void testPMul(int one, int two, int three) {
+    public void testPMul(BigDecimal one, BigDecimal two, BigDecimal three) {
         Assert.assertEquals(one, Main.calc(two, three, '*'), "Умножение прошло успешно" );
     }
 
@@ -116,15 +122,17 @@ public class CalcTests {
         };
     }
     @Test(dataProvider = "negativeMul")
-    public void testNMul(int one, int two, int three) {
+    public void testNMul(BigDecimal one, BigDecimal two, BigDecimal three) {
         Assert.assertNotEquals(one, Main.calc(two, three, '*'), "Умножение прошло с ошибкой" );
     }
 
-    /**
+
+/**
      * Позитивное и негативное тестирование операции "Деление"
      * Деление на ноль
      * Деление с остатком
      */
+
 
     @DataProvider
     public Object [][] positiveDiv() {
@@ -137,7 +145,7 @@ public class CalcTests {
         };
     }
     @Test(dataProvider = "positiveDiv")
-    public void testPDiv(int one, int two, int three) {
+    public void testPDiv(BigDecimal one, BigDecimal two, BigDecimal three) {
         Assert.assertEquals(one, Main.calc(two, three, '/'), "Деление прошло успешно" );
     }
 
@@ -150,7 +158,7 @@ public class CalcTests {
         };
     }
     @Test(dataProvider = "negativeDiv")
-    public void testNDiv(int one, int two, int three) {
+    public void testNDiv(BigDecimal one, BigDecimal two, BigDecimal three) {
         Assert.assertNotEquals(one, Main.calc(two, three, '/'), "Деление прошло с ошибкой" );
     }
 
@@ -161,7 +169,7 @@ public class CalcTests {
         };
     }
     @Test(dataProvider = "SCDiv", expectedExceptions = ArithmeticException.class)
-    public void testSpecialCasesDiv(int one, int two, int three) {
+    public void testSpecialCasesDiv(BigDecimal one, BigDecimal two, BigDecimal three) {
         Assert.assertEquals(one, Main.calc(two, three, '/'), "Деление на ноль прошло успешно");
     }
 
@@ -173,7 +181,8 @@ public class CalcTests {
         };
     }
     @Test(dataProvider = "withoutRemainderDiv")
-    public void testWithoutRemainderDiv(int one, int two, int three) {
+    public void testWithoutRemainderDiv(BigDecimal one, BigDecimal two, BigDecimal three) {
         Assert.assertEquals(one, Main.calc(two, three, '/'), "Деление c остатком прошло успешно");
     }
 }
+
